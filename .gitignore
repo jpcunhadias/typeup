@@ -15,3 +15,6 @@ __pycache__/
 .ruff_cache/
 dist/
 .mypy_cache/
+
+# LaTeX aux files from `typeup tex`
+build/

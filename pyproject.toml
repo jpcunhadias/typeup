@@ -1,13 +1,27 @@
 [project]
 name = "typeup"
 version = "0.1.0"
-description = "Add your description here"
+description = "Typed-up study notes from Markdown to PDF: marks, content boxes, legend and combined PDFs (pandoc + XeLaTeX)"
 readme = "README.md"
 authors = [
     { name = "Joao Pedro Dias", email = "joaopedrocdias@hotmail.com" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["pandoc", "latex", "notes", "study", "pdf", "lua-filter"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "Programming Language :: Python :: 3",
+    "Topic :: Text Processing :: Markup :: LaTeX",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
 dependencies = []
+
+[project.scripts]
+typeup = "typeup.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.13.9,<0.14.0"]
@@ -20,15 +34,22 @@ dev = [
     "pytest>=9.2.0",
     "ruff>=0.17.5",
 ]
+# only for the example figure scripts (make figures)
+examples = [
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+]
 
 [tool.ruff]
 line-length = 100
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["tex: needs XeLaTeX (TeX Live); deselect with -m 'not tex'"]
 
 [tool.mypy]
 strict = true
