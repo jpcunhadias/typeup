@@ -58,3 +58,5 @@ markers = ["tex: needs XeLaTeX (TeX Live); deselect with -m 'not tex'"]
 
 [tool.mypy]
 strict = true
+# the example figure scripts need the "examples" group (matplotlib, numpy)
+exclude = ["^examples/"]

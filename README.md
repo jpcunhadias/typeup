@@ -30,7 +30,8 @@ The [example notes](examples/LinearAlgebra/notes/) and
 
 - [pandoc](https://pandoc.org/installing.html) 3.0 or newer
 - XeLaTeX with these packages (all in TeX Live; on Debian/Ubuntu,
-  `texlive-xetex texlive-latex-extra texlive-fonts-recommended fonts-lmodern`):
+  `texlive-xetex texlive-latex-extra texlive-fonts-recommended lmodern`;
+  `texlive-science` for the homework template):
   tcolorbox, etoolbox, fancyhdr, lastpage, titlesec, needspace, caption,
   float, unicode-math
 - Python 3.11+ and [uv](https://docs.astral.sh/uv/) (or pip)

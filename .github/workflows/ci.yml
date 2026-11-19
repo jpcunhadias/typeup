@@ -49,7 +49,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends /tmp/pandoc.deb \
             texlive-xetex texlive-latex-recommended texlive-latex-extra \
-            texlive-fonts-recommended fonts-lmodern fonts-texgyre latexmk poppler-utils
+            texlive-fonts-recommended texlive-science texlive-plain-generic \
+            lmodern fonts-lmodern fonts-texgyre latexmk poppler-utils
       - run: uv sync --locked
       - name: All tests, TeX included
         run: uv run pytest
