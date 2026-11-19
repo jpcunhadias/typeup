@@ -9,8 +9,8 @@ or the file named in `$TYPEUP_CONFIG`. Every key is optional:
 mainfont = "Helvetica Neue"   # any font installed on your system
 mainfontoptions = []          # fontspec options for it
 fontsize = "11pt"
-margin = "2.3cm"
-linestretch = 1.15
+margin = "3cm"
+linestretch = 1.25
 file_links = true             # false: no absolute paths in PDFs
 
 [legend]                      # see "Legend wording" below
@@ -27,6 +27,7 @@ All of the look is defined in one file, `src/typeup/data/notes-header.tex`:
 
 - the colours of each box;
 - heading styles;
+- the gap between paragraphs (`\parskip`);
 - the header and footer;
 - table stripes;
 - the code frame.

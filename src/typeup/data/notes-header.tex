@@ -4,6 +4,10 @@
 % blockquotes that start with **[Added]**, **[Your mark]**, **[Unclear]**
 % or another **[...]** source label.
 \usepackage[most]{tcolorbox}
+
+% Paragraphs: a clear gap between them (pandoc's default is 6pt), so long
+% stretches of text with inline maths are easier to follow.
+\setlength{\parskip}{0.75em plus 2pt minus 1pt}
 \usepackage{xcolor}
 
 % Tables: alternate rows get a light grey band and a little padding, so

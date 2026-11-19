@@ -6,6 +6,11 @@ follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Roomier default spacing for easier reading: line spacing 1.25 (was 1.15),
+  3 cm margins (was 2.3 cm), and a larger gap between paragraphs.
+
 ### Fixed
 
 - Lists, tables, formulas and code that follow a labelled line in a
