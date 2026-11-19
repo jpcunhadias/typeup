@@ -6,8 +6,8 @@ Looked up at ``$TYPEUP_CONFIG``, else ``$XDG_CONFIG_HOME/typeup/config.toml``
     mainfont = "Helvetica Neue"   # a font installed on your system
     mainfontoptions = []          # fontspec options for it
     fontsize = "11pt"
-    margin = "2.3cm"
-    linestretch = 1.15
+    margin = "3cm"
+    linestretch = 1.25
     file_links = true             # see docs/syntax.md, "Links to files"
 
     [legend]                      # what each mark means, in the legend
@@ -41,8 +41,8 @@ class Config:
     mainfont: str = DEFAULT_FONT
     mainfontoptions: list[str] = field(default_factory=lambda: list(DEFAULT_FONT_OPTIONS))
     fontsize: str = "11pt"
-    margin: str = "2.3cm"
-    linestretch: float = 1.15
+    margin: str = "3cm"
+    linestretch: float = 1.25
     file_links: bool = True
     legend: dict[str, str] = field(default_factory=dict)
 
