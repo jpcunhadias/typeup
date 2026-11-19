@@ -53,17 +53,18 @@ def course_name(folder: str) -> str:
 def course_from_path(path: Path) -> str:
     """The course a note belongs to, from where it is stored.
 
-    The folder above a ``notes/`` folder (``LinearAlgebra/notes/x.md``), or
-    else the folder directly under a ``courses/`` folder
-    (``courses/LinearAlgebra/NOTATION.md``). Empty if neither applies.
+    The folder directly under a ``courses/`` folder
+    (``courses/LinearAlgebra/any/depth/x.md``), or else the folder above a
+    ``notes/`` folder (``LinearAlgebra/notes/x.md``). Empty if neither
+    applies.
     """
     parts = path.resolve().parent.parts
-    for i in range(len(parts) - 1, 0, -1):
-        if parts[i].lower() == "notes":
-            return course_name(parts[i - 1])
     for i, part in enumerate(parts[:-1]):
         if part.lower() == "courses":
             return course_name(parts[i + 1])
+    for i in range(len(parts) - 1, 0, -1):
+        if parts[i].lower() == "notes":
+            return course_name(parts[i - 1])
     return ""
 
 

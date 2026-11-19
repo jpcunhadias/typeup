@@ -33,8 +33,8 @@ text, such as `Week 3`, is printed as given.
     exercise class), giving "LA L01";
   - `Sheet <n>`, giving "LA Sheet 6";
   - anything else: the code alone ("LA").
-- **Course**: the folder above a `notes/` folder or, failing that, the
-  folder directly under a `courses/` folder. CamelCase is split into
+- **Course**: the folder directly under a `courses/` folder (at any
+  depth below it) or, failing that, the folder above a `notes/` folder. CamelCase is split into
   words, and short words other than the first stay lower case:
   `HistoryOfArt` becomes "History of Art".
 

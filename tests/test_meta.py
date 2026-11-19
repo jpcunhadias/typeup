@@ -37,6 +37,11 @@ def test_course_from_courses_folder(tmp_path: Path) -> None:
     assert course_from_path(note) == "Operations Research"
 
 
+def test_courses_folder_wins_over_notes(tmp_path: Path) -> None:
+    note = tmp_path / "courses" / "HistoryOfArt" / "work" / "notes" / "x.md"
+    assert course_from_path(note) == "History of Art"
+
+
 def test_no_course(tmp_path: Path) -> None:
     assert course_from_path(tmp_path / "random" / "x.md") == ""
 

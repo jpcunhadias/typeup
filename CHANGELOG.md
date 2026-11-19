@@ -6,6 +6,14 @@ follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The legend explains each mark in neutral wording ("added while typing
+  up", "a note the writer made in the margin", "an uncertain reading").
+  The `legend-*` keys still change it.
+- The course in the header comes from a `courses/<Course>/` folder first,
+  at any depth below it, and only then from the folder above `notes/`.
+
 ## [0.1.0] - 2026-11-19
 
 ### Added
