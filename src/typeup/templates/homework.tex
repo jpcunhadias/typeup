@@ -1,0 +1,146 @@
+% Homework / exercise-sheet submission (typeup template homework).
+% One problem environment per exercise on the sheet, numbered to match it.
+% Fill in the \course, \sheet, \due, \student and \matrikel lines.
+% Compile with: typeup tex homework.tex
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{csquotes}
+\usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,noabbrev]{cleveref} % load last
+
+\newcommand{\course}{Course Name}
+\newcommand{\sheet}{1}
+\newcommand{\due}{2026-10-26}
+\newcommand{\student}{Your Name}
+\newcommand{\matrikel}{Student ID}
+
+\hypersetup{
+  pdftitle={\course: exercise sheet \sheet},
+  pdfauthor={\student},
+}
+
+\newcommand{\R}{\mathbb{R}}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+% \begin{problem}{3} ... \end{problem} prints "Problem 3" and can be
+% \cref'd; the number is passed in so it matches the sheet, not a counter.
+\newcounter{problem}
+\crefname{problem}{Problem}{Problems}
+\newenvironment{problem}[1]{%
+  \par\bigskip
+  \renewcommand{\theproblem}{#1}%
+  \refstepcounter{problem}%
+  \noindent{\large\bfseries Problem #1}\par\nopagebreak\medskip
+}{\par}
+% Restated task text, set off from the solution
+\newenvironment{task}{\begin{quote}\itshape}{\end{quote}}
+% The answer. No end-of-proof box: after a display it lands on a line of
+% its own; use amsthm's proof environment inside for actual proofs
+\newenvironment{solution}{\par\noindent\textit{Solution.}\ }{\par}
+
+% --- Code and pseudocode
+% listings, not minted, so no -shell-escape is needed. Languages listings
+% knows include Python, R, C, Java, SQL, bash.
+\definecolor{codebg}{gray}{0.97}
+\definecolor{codekw}{RGB}{0,70,140}
+\definecolor{codecomment}{RGB}{100,110,120}
+\definecolor{codestring}{RGB}{150,50,20}
+\lstdefinestyle{study}{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{codekw}\bfseries,
+  commentstyle=\color{codecomment}\itshape,
+  stringstyle=\color{codestring},
+  numbers=left, numberstyle=\tiny\color{codecomment}, numbersep=6pt,
+  columns=fullflexible, keepspaces=true,
+  breaklines=true, postbreak=\mbox{\textcolor{codecomment}{$\hookrightarrow$}\space},
+  showstringspaces=false, tabsize=4, upquote=true,
+  aboveskip=0pt, belowskip=0pt,
+  % pdfLaTeX: listings reads bytes, so map the accented letters likely in
+  % comments and strings; add more here if a compile reports one
+  literate={á}{{\'a}}1 {à}{{\`a}}1 {â}{{\^a}}1 {ã}{{\~a}}1 {ä}{{\"a}}1
+           {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ô}{{\^o}}1
+           {õ}{{\~o}}1 {ö}{{\"o}}1 {ú}{{\'u}}1 {ü}{{\"u}}1 {ç}{{\c c}}1
+           {ß}{{\ss}}1 {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1,
+}
+\lstset{style=study}
+% \begin{code}{Python} ... \end{code}: boxed listing titled with the
+% language. Optional first argument takes extra tcolorbox keys.
+\newtcblisting{code}[2][]{listing only, breakable,
+  colback=codebg, colframe=black!25, boxrule=0.4pt, arc=1pt,
+  left=14pt, top=1pt, bottom=1pt,
+  fonttitle=\small\sffamily, coltitle=black, colbacktitle=black!8,
+  title={#2}, listing options={style=study,language=#2}, #1}
+% \codefile{path/to/script.R}{R}: the same box around a file on disk
+\newtcbinputlisting{\codefile}[3][]{listing file={#2}, listing only,
+  breakable, colback=codebg, colframe=black!25, boxrule=0.4pt, arc=1pt,
+  left=14pt, top=1pt, bottom=1pt,
+  fonttitle=\small\sffamily, coltitle=black, colbacktitle=black!8,
+  title={\detokenize{#2}}, listing options={style=study,language=#3}, #1}
+% Inline code: \lstinline{x <- c(1, 2)}; add [language=R] when it matters
+\crefname{algorithm}{Algorithm}{Algorithms}
+% --- end code and pseudocode
+
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\fancyhf{}
+\lhead{\course\ --- Sheet \sheet}
+\rhead{\student, \matrikel}
+\cfoot{\thepage\ / \pageref{LastPage}}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries \course}\\[0.4em]
+  {\large Exercise sheet \sheet}\\[0.4em]
+  \student\ (\matrikel) \quad Due \due
+\end{center}
+
+\begin{problem}{1}
+  \label{prob:first}
+  \begin{task}
+    Copy the task text from the sheet here.
+  \end{task}
+
+  \begin{solution}
+    Work goes here, one step per line in an \texttt{align*} where it is a
+    calculation:
+    \begin{align*}
+      (a + b)^2 &= (a + b)(a + b) \\
+                &= a^2 + 2ab + b^2.
+    \end{align*}
+  \end{solution}
+\end{problem}
+
+\begin{problem}{2}
+  \begin{task}
+    A task with parts:
+  \end{task}
+  \begin{enumerate}[label=(\alph*)]
+    \item First part. Uses the result of \cref{prob:first}.
+    \item Second part, with code:
+      \begin{code}{R}
+x <- c(2, 4, 4, 5)
+mean(x)  # 3.75
+      \end{code}
+  \end{enumerate}
+\end{problem}
+
+\end{document}

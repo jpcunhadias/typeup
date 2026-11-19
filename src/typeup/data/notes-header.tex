@@ -1,0 +1,191 @@
+% typeup: the look of typed-up study notes. Loaded with
+% pandoc --include-in-header (the typeup CLI does this) together with
+% marks.lua. The mark boxes are what marks.lua emits for
+% blockquotes that start with **[Added]**, **[Your mark]**, **[Unclear]**
+% or another **[...]** source label.
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+
+% Tables: alternate rows get a light grey band and a little padding, so
+% cells that wrap onto several lines stay visibly apart from the next row.
+% \rowcolors needs xcolor's table option: typeup passes it as a class
+% option, because the pandoc template loads xcolor before this header.
+\definecolor{rowstripe}{RGB}{242,242,242}
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{%
+  \rowcolors{2}{white}{rowstripe}%
+  \renewcommand{\arraystretch}{1.25}}
+
+\definecolor{addedframe}{RGB}{30,90,170}
+\definecolor{addedback}{RGB}{235,242,252}
+\definecolor{yourframe}{RGB}{190,120,0}
+\definecolor{yourback}{RGB}{253,245,225}
+\definecolor{unclearframe}{RGB}{190,30,45}
+\definecolor{unclearback}{RGB}{253,232,234}
+\definecolor{sourceframe}{RGB}{110,110,110}
+\definecolor{sourceback}{RGB}{243,243,243}
+\definecolor{metacol}{RGB}{110,110,110}
+
+% In the "How to read this note" legend (notelegend, below) each mark box
+% says after its name what it means; elsewhere the name stands alone
+\newtoggle{inlegend}
+\newcommand{\legendrole}[1]{\iftoggle{inlegend}{\enspace{\mdseries\color{metacol}#1}}{}}
+% What each mark means, as the legend says it. A note's legend-added,
+% legend-your, legend-unclear and legend-source metadata (or the config
+% file's [legend] table) replace these (marks.lua, docs/config.md)
+\newcommand{\addedrole}{what I filled in or explained: check it against the source}
+\newcommand{\yourrole}{your own notes to yourself}
+\newcommand{\unclearrole}{a reading I am not sure of: check it against your page}
+\newcommand{\sourcerole}{from the source named in the label}
+
+% Common box style: thin left rule, coloured title on the same line
+\tcbset{notemark/.style={enhanced, breakable, boxrule=0pt, leftrule=2.5pt,
+  arc=0pt, outer arc=0pt, left=6pt, right=6pt, top=3pt, bottom=3pt,
+  before skip=6pt, after skip=6pt, fontupper=\small,
+  attach title to upper={\enspace}, fonttitle=\small\bfseries}}
+
+\newtcolorbox{markadded}{notemark, colframe=addedframe, colback=addedback,
+  coltitle=addedframe, title={Added\legendrole{\addedrole}}}
+\newtcolorbox{markyour}{notemark, colframe=yourframe, colback=yourback,
+  coltitle=yourframe, title={Your mark\legendrole{\yourrole}}}
+\newtcolorbox{markunclear}{notemark, colframe=unclearframe,
+  colback=unclearback, coltitle=unclearframe, title={Unclear\legendrole{\unclearrole}}}
+% Any other **[...]** label: the label text is the title
+\newtcolorbox{marksource}[1]{notemark, colframe=sourceframe,
+  colback=sourceback, coltitle=sourceframe, title={#1\legendrole{\sourcerole}}}
+
+% "How to read this note": the ::: legend div at the top of a note, with
+% one real, shortened example of each mark the note uses (marks.lua)
+\newtcolorbox{notelegend}{enhanced, boxrule=0.4pt, arc=1.5pt,
+  colframe=metacol!40, colback=white, left=7pt, right=7pt, top=4pt,
+  bottom=4pt, before skip=8pt, after skip=10pt, fontupper=\small,
+  title={How to read this note}, fonttitle=\small\bfseries,
+  coltitle=metacol, colbacktitle=white, toptitle=3pt, bottomtitle=0pt,
+  before upper={\toggletrue{inlegend}\tcbset{notemark/.append style={
+    before skip=3pt, after skip=5pt, breakable=false}}}}
+
+% Inline [x_i?]{.unclear}: a reading to check against the page
+\newcommand{\unclearinline}[1]{%
+  \tcbox[on line, boxrule=0pt, arc=1pt, boxsep=0pt, left=2pt, right=2pt,
+    top=1pt, bottom=1pt, colback=unclearback, coltext=unclearframe]{#1}}
+
+% Content boxes: what KIND of text it is (the mark boxes above say where
+% it came from). marks.lua turns a fenced div into one of these:
+%   ::: {.definition title="Dual problem"}  ...  :::
+% Definition, Theorem, Proposition, Lemma, Corollary, Example, Remark and
+% Exercise share one counter, so "Definition 3" is followed by "Example 4"
+% and any number is easy to find. Proof has no number and ends with a box.
+% The counter restarts with each note in a combined PDF.
+\definecolor{nbdefframe}{RGB}{0,115,105}
+\definecolor{nbthmframe}{RGB}{105,60,150}
+\definecolor{nbexframe}{RGB}{55,125,55}
+\definecolor{nbremframe}{RGB}{75,90,110}
+\definecolor{nbexerframe}{RGB}{160,65,115}
+\definecolor{nbproofframe}{RGB}{150,150,150}
+
+\tcbset{notebox/.style={enhanced, breakable, boxrule=0.5pt, arc=1.5pt,
+  outer arc=1.5pt, left=7pt, right=7pt, top=4pt, bottom=4pt,
+  toptitle=2pt, bottomtitle=2pt, before skip=8pt, after skip=8pt,
+  fonttitle=\bfseries\small}}
+
+% \nbbox{env}{Label}{colour}: a numbered box; its argument is the optional
+% title in brackets after the number ({} for none)
+\newcommand{\nbtitle}[2]{#1~\thetcbcounter\ifblank{#2}{}{\enspace(#2)}}
+\newtcolorbox[auto counter]{nbdefinition}[1]{notebox,
+  colframe=nbdefframe, colback=nbdefframe!5, colbacktitle=nbdefframe!15,
+  coltitle=nbdefframe!70!black, title={\nbtitle{Definition}{#1}}}
+\newcommand{\nbbox}[3]{%
+  \newtcolorbox[use counter from=nbdefinition]{#1}[1]{notebox,
+    colframe=#3, colback=#3!5, colbacktitle=#3!15, coltitle=#3!70!black,
+    title={\nbtitle{#2}{##1}}}}
+\nbbox{nbtheorem}{Theorem}{nbthmframe}
+\nbbox{nbproposition}{Proposition}{nbthmframe}
+\nbbox{nblemma}{Lemma}{nbthmframe}
+\nbbox{nbcorollary}{Corollary}{nbthmframe}
+\nbbox{nbexample}{Example}{nbexframe}
+\nbbox{nbremark}{Remark}{nbremframe}
+\nbbox{nbexercise}{Exercise}{nbexerframe}
+% Proof: no number, a thin grey rule on the left, a box at the end
+\newtcolorbox{nbproof}[1]{notemark, colframe=nbproofframe, colback=white,
+  coltitle=black, fontupper=\normalsize, fonttitle=\itshape\small,
+  title={\ifblank{#1}{Proof.}{Proof (#1).}},
+  after upper={\par\nobreak\hfill$\square$}}
+
+% Figures (plots made with the typeup.notes matplotlib style, docs/figures.md): stay where
+% they are written instead of floating to another page, centred, with a
+% small grey caption under them
+\usepackage{float}
+\makeatletter\def\fps@figure{H}\makeatother
+\usepackage{caption}
+\DeclareCaptionFont{meta}{\color{metacol}}
+\captionsetup[figure]{font={small,meta}, labelfont={bf,meta},
+  skip=4pt, belowskip=4pt}
+
+% Keep-with-next (marks.lua puts \needspace before headings and
+% lead-in lines, so they never end a page alone)
+\usepackage{needspace}
+
+% Let TeX stretch spaces a little more before a line sticks out
+\setlength{\emergencystretch}{2em}
+
+% ---- Page furniture (ideas from the Eisvogel pandoc template, BSD-3) ----
+% Which note this is: marks.lua sets these from the metadata of a single
+% note (course, label, date), and
+% \notebreak sets them per note in a combined PDF.
+\newcommand{\notecourse}{}
+\newcommand{\notelabel}{}
+\newcommand{\notedate}{}
+\definecolor{headcol}{RGB}{25,55,95}
+
+% Running header (course . lecture on the left, date on the right) and a
+% "page n / N" footer on every page; the title page of a combined PDF
+% has the footer only
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{{\color{metacol!50}\hrule height\headrulewidth}}
+\fancyhead[L]{\footnotesize\color{metacol}\notecourse
+  \ifdefempty{\notelabel}{}{\enspace\textperiodcentered\enspace\notelabel}}
+\fancyhead[R]{\footnotesize\color{metacol}\notedate}
+\fancyfoot[C]{\footnotesize\color{metacol}\thepage\ / \pageref*{LastPage}}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}%
+  \fancyfoot[C]{\footnotesize\color{metacol}\thepage\ / \pageref*{LastPage}}}
+
+% Headings: the note's title (#) in navy with a rule under it, then the
+% course . lecture . date line that marks.lua puts after the first #
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\color{headcol}}{}{0pt}{}
+  [{\vspace{2pt}\color{headcol!60}\titlerule[0.8pt]}]
+\titleformat{\subsection}{\large\bfseries\color{headcol}}{}{0pt}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{headcol!80!black}}{}{0pt}{}
+\titlespacing*{\section}{0pt}{4pt}{10pt}
+\titlespacing*{\subsection}{0pt}{14pt}{6pt}
+\titlespacing*{\subsubsection}{0pt}{10pt}{4pt}
+\newcommand{\notemetaline}{%
+  \ifdefempty{\notecourse}{}{%
+    {\noindent\small\color{metacol}\notecourse
+     \ifdefempty{\notelabel}{}{\enspace\textperiodcentered\enspace\notelabel}%
+     \ifdefempty{\notedate}{}{\enspace\textperiodcentered\enspace\notedate}\par}%
+    \vspace{6pt}}}
+
+% Code blocks: a light grey frame, for highlighted code (pandoc's Shaded)
+% and plain ``` blocks alike (marks.lua wraps those in codebox)
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{codeback}{RGB}{248,248,248}
+\newtcolorbox{codebox}{enhanced, breakable, boxrule=0.4pt, arc=1.5pt,
+  colframe=codeframe, colback=codeback, left=6pt, right=6pt, top=3pt,
+  bottom=3pt, before skip=6pt, after skip=8pt, fontupper=\small}
+\makeatletter
+\AtBeginDocument{\@ifundefined{Shaded}{}{%
+  \renewenvironment{Shaded}{\begin{codebox}}{\end{codebox}}}}
+
+% Each note in a combined PDF starts on a new page (typeup combine),
+% restarts the box numbers and sets its own header:
+%   \notebreak{course}{label}{date}
+\newcommand{\notebreak}[3]{\clearpage\setcounter{tcb@cnt@nbdefinition}{0}%
+  \renewcommand{\notecourse}{#1}\renewcommand{\notelabel}{#2}%
+  \renewcommand{\notedate}{#3}}
+\makeatother

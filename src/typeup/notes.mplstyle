@@ -1,0 +1,47 @@
+# typeup: matplotlib style for figures in typed-up notes, with the fonts
+# and colours of the PDF (notes-header.tex). With typeup installed:
+#   plt.style.use("typeup.notes")
+# (or the path printed by `typeup path mplstyle`). Save figures as PDF
+# (vector) at the width they will have on the page.
+
+font.family: sans-serif
+font.sans-serif: TeX Gyre Heros, Helvetica Neue, Helvetica, Arial, DejaVu Sans
+font.size: 9
+mathtext.fontset: cm
+
+# PDF colours, in order: Added blue, definition teal, Your-mark amber,
+# theorem purple, example green, Unclear red, heading navy
+axes.prop_cycle: cycler('color', ['1E5AAA', '007369', 'BE7800', '693C96', '377D37', 'BE1E2D', '19375F'])
+lines.linewidth: 1.6
+lines.markersize: 4
+
+figure.figsize: 5.2, 2.8
+figure.dpi: 150
+savefig.bbox: tight
+savefig.pad_inches: 0.03
+savefig.format: pdf
+pdf.fonttype: 42
+
+axes.edgecolor: 6E6E6E
+axes.linewidth: 0.6
+axes.labelcolor: 333333
+axes.titlesize: 9.5
+axes.titleweight: bold
+axes.titlecolor: 19375F
+axes.titlelocation: left
+axes.spines.top: False
+axes.spines.right: False
+axes.grid: True
+axes.axisbelow: True
+grid.color: E6E6E6
+grid.linewidth: 0.6
+
+xtick.color: 6E6E6E
+ytick.color: 6E6E6E
+xtick.labelcolor: 333333
+ytick.labelcolor: 333333
+xtick.major.size: 3
+ytick.major.size: 3
+
+legend.frameon: False
+legend.fontsize: 8.5

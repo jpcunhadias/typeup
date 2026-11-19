@@ -1,0 +1,93 @@
+% Exam cheat sheet / formula sheet (typeup template cheatsheet): dense, landscape, three columns, small
+% type. Check the exam rules first (pages allowed, one- or two-sided,
+% handwritten only?). Shrink with the font-size option and \columns below
+% before cutting content.
+\documentclass[8pt,landscape]{extarticle}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage[a4paper,margin=0.8cm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[most]{tcolorbox}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\columns}{3}
+\newcommand{\course}{Course Name}
+\newcommand{\exam}{Final exam, 2027-02}
+\newcommand{\student}{Your Name}
+\hypersetup{pdftitle={\course: cheat sheet}, pdfauthor={\student}}
+
+% Tight spacing everywhere
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1pt}
+\setlength{\columnsep}{8pt}
+\setlength{\columnseprule}{0.2pt}
+\setlist{nosep}
+\setlist[itemize]{leftmargin=*}
+\setlist[description]{leftmargin=0pt}
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\setlength{\abovedisplayshortskip}{1pt}
+\setlength{\belowdisplayshortskip}{1pt}
+\pagestyle{empty}
+
+% One box per topic; the title is the topic name
+\newtcolorbox{topic}[1]{enhanced,breakable,colback=white,
+  colframe=black!60,colbacktitle=black!12,coltitle=black,
+  fonttitle=\bfseries\small,title={#1},
+  boxrule=0.4pt,arc=1pt,left=2pt,right=2pt,top=1pt,bottom=1pt,
+  boxsep=1pt,before skip=2pt,after skip=2pt}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+
+\begin{document}
+\begin{multicols*}{\columns}
+\raggedcolumns
+
+{\large\bfseries \course}\quad{\small \exam}\par\medskip
+
+\begin{topic}{Topic 1: Linear algebra}
+  \begin{description}
+    \item[Inverse (2×2)] \(\begin{pmatrix} a & b \\ c & d \end{pmatrix}^{-1}
+      = \frac{1}{ad - bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix}\)
+    \item[Eigenvalues] roots of \(\det(A - \lambda I) = 0\)
+    \item[Trace, determinant] \(\operatorname{tr} A = \sum_i \lambda_i\),
+      \(\det A = \prod_i \lambda_i\)
+  \end{description}
+\end{topic}
+
+\begin{topic}{Topic 2: Probability}
+  \(\E[aX + b] = a\E[X] + b\), \quad \(\Var(aX + b) = a^2 \Var(X)\)
+  \[
+    P(A \mid B) = \frac{P(B \mid A)\,P(A)}{P(B)}
+  \]
+\end{topic}
+
+\begin{topic}{Common mistakes}
+  \begin{itemize}
+    \item Sign of \(-1\) when expanding \(-(a - b)\).
+    \item \(\Var(X + Y) = \Var X + \Var Y\) only if independent.
+  \end{itemize}
+\end{topic}
+
+\begin{topic}{Reference table}
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Distribution & Mean & Variance \\
+    \midrule
+    Bernoulli\((p)\) & \(p\) & \(p(1-p)\) \\
+    Normal\((\mu,\sigma^2)\) & \(\mu\) & \(\sigma^2\) \\
+    \bottomrule
+  \end{tabular}
+\end{topic}
+
+\end{multicols*}
+\end{document}
