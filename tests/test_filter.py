@@ -100,3 +100,31 @@ def test_file_links_stay_relative_without_notes_dir() -> None:
 def test_legend_wording_from_metadata() -> None:
     out = to_latex("# T\n", "--metadata=legend-added:explained by the tutor")
     assert "\\renewcommand{\\addedrole}{explained by the tutor}" in out
+
+
+def test_blocks_after_a_label_stay_in_the_box() -> None:
+    md = (
+        "> **[Added]** The steps:\n>\n> 1. one\n> 2. two\n>\n"
+        "> | a | b |\n> |---|---|\n> | 1 | 2 |\n>\n> $$x = 1$$\n>\n> Last line.\n"
+    )
+    out = to_latex(md)
+    box = out[out.index("\\begin{markadded}") : out.index("\\end{markadded}")]
+    for part in ("\\begin{enumerate}", "\\begin{tabular}", "x = 1", "Last line."):
+        assert part in box
+    assert "\\begin{quote}" not in out
+
+
+def test_next_label_starts_a_new_box() -> None:
+    out = to_latex("> **[Added]** a\n>\n> - item\n>\n> **[Your mark]** b\n")
+    assert out.index("\\end{markadded}") < out.index("\\begin{markyour}")
+    assert out.index("item") < out.index("\\end{markadded}")
+
+
+def test_table_in_content_box_is_a_tabular() -> None:
+    out = to_latex("::: example\n| a | b |\n|---|---|\n| 1 | 2 |\n:::\n")
+    assert "\\begin{tabular}" in out and "longtable" not in out
+    assert out.index("\\bottomrule") < out.index("\\end{tabular}")
+
+
+def test_table_outside_boxes_stays_a_longtable() -> None:
+    assert "\\begin{longtable}" in to_latex("| a | b |\n|---|---|\n| 1 | 2 |\n")

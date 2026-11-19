@@ -76,8 +76,39 @@ local function boxed(run)
            pandoc.RawBlock("latex", "\\end{" .. env .. "}") }
 end
 
+-- A table inside a box: longtable can't break inside a tcolorbox and loses
+-- its last rule there, so the table is written as a plain tabular
+-- (centred, same rules and stripes), which stays on one page
+local function box_table(tbl)
+  local tex = pandoc.write(pandoc.Pandoc({ tbl }), "latex")
+  local spec = tex:match("\\begin{longtable}%[%]{(.-)}\n")
+  if not spec then return tbl end
+  local body = tex:match("\\begin{longtable}%[%]{.-}\n(.*)\\end{longtable}")
+  -- a repeated header (\endfirsthead ... \endhead) is dropped; the foot
+  -- (\endhead ... \endlastfoot) moves to the end
+  body = body:gsub("\\endfirsthead\n.-\\endhead\n", "\\endhead\n")
+  local head, foot, rows = body:match("^(.-)\\endhead\n(.-)\\endlastfoot\n(.*)$")
+  if not head then
+    head, rows = body:match("^(.-)\\endhead\n(.*)$")
+    foot = ""
+  end
+  if not head then return tbl end
+  -- stripes as outside a box: grey header, then every other row
+  return pandoc.RawBlock("latex", "\\par\\smallskip{\\centering\\rowcolors{1}{rowstripe}{}"
+    .. "\\renewcommand{\\arraystretch}{1.25}\n\\begin{tabular}{" .. spec .. "}\n"
+    .. head .. rows .. foot .. "\\end{tabular}\\par}\\medskip")
+end
+
+local function box_tables(blocks)
+  local out = pandoc.List()
+  for _, b in ipairs(blocks) do
+    out:insert(b.t == "Table" and box_table(b) or b)
+  end
+  return out
+end
+
 function BlockQuote(bq)
-  local out, plain, changed = pandoc.List(), pandoc.List(), false
+  local out, plain, changed, box_open = pandoc.List(), pandoc.List(), false, false
   local function flush()
     if #plain > 0 then
       out:insert(pandoc.BlockQuote(plain))
@@ -91,16 +122,18 @@ function BlockQuote(bq)
         if blocks then
           flush()
           out:extend(blocks)
-          changed = true
+          changed, box_open = true, true
         elseif #run > 0 then
           plain:insert(pandoc.Para(run))
+          box_open = false
         end
       end
-    elseif block.t == "Para" and changed and #plain == 0 and #out > 0 then
-      -- a follow-on paragraph inside a labelled quote belongs to the box
-      -- above it: reopen that box's content
+    elseif box_open then
+      -- whatever follows a labelled line in the same quote (paragraphs,
+      -- lists, tables, formulas, code) belongs to that box, up to the next
+      -- label: reopen the box's content
       local last_end = out:remove()
-      out:insert(block)
+      out:insert(block.t == "Table" and box_table(block) or block)
       out:insert(last_end)
     else
       plain:insert(block)
@@ -194,7 +227,7 @@ function Div(div)
         open = open .. "{" .. latex_title(div.attributes["title"]) .. "}"
       end
       local out = pandoc.List({ pandoc.RawBlock("latex", open) })
-      out:extend(div.content)
+      out:extend(box_tables(div.content))
       out:insert(pandoc.RawBlock("latex", "\\end{" .. env .. "}"))
       return out
     end

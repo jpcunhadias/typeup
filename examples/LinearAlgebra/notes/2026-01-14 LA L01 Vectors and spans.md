@@ -40,7 +40,10 @@ Vectors are added entry by entry, and multiplied by a scalar $c$ entry by
 entry: $(c\mathbf{v})_i = c\, v_i$.
 
 > **[Added]** "Scalar" here just means a real number. The word is used to
-> tell numbers apart from vectors.
+> tell numbers apart from vectors. Two rules follow from the definitions:
+>
+> - $\mathbf{u} + \mathbf{w} = \mathbf{w} + \mathbf{u}$ (order doesn't matter)
+> - $c(\mathbf{u} + \mathbf{w}) = c\mathbf{u} + c\mathbf{w}$ (scaling distributes)
 
 ## 1.2 Linear combinations
 

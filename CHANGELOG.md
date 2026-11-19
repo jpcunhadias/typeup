@@ -6,13 +6,13 @@ follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Changed
+### Fixed
 
-- The legend explains each mark in neutral wording ("added while typing
-  up", "a note the writer made in the margin", "an uncertain reading").
-  The `legend-*` keys still change it.
-- The course in the header comes from a `courses/<Course>/` folder first,
-  at any depth below it, and only then from the folder above `notes/`.
+- Lists, tables, formulas and code that follow a labelled line in a
+  blockquote stay inside that mark box instead of falling out into a
+  plain quote.
+- Tables inside mark and content boxes keep their bottom rule and the same
+  stripes as tables outside a box.
 
 ## [0.1.0] - 2026-11-19
 
@@ -23,7 +23,8 @@ follow [Semantic Versioning](https://semver.org/).
     inline `.unclear` spans;
   - numbered content boxes (definition, theorem, example, exercise,
     proof and others);
-  - a "How to read this note" legend;
+  - a "How to read this note" legend, its wording settable per note or
+    in the config;
   - keep-with-next page breaks;
   - striped tables with content-based column widths;
   - framed code blocks;

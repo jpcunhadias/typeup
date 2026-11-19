@@ -23,8 +23,11 @@ coloured box:
 | `[anything else]` | grey | content from the source the label names |
 
 - Several labelled lines in one blockquote become several boxes, in order.
-- A paragraph that follows a labelled line in the same blockquote belongs
-  to that box.
+- Everything that follows a labelled line in the same blockquote
+  (paragraphs, lists, tables, formulas, code) belongs to that box, up to
+  the next label. Leave a `>` line empty before a list or table.
+- A table inside a box stays on one page (it can't break across pages
+  there); keep long tables outside boxes.
 - A blockquote without a label stays an ordinary quote.
 
 For a single uncertain symbol in running text, use an inline span:
