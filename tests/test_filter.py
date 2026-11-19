@@ -128,3 +128,10 @@ def test_table_in_content_box_is_a_tabular() -> None:
 
 def test_table_outside_boxes_stays_a_longtable() -> None:
     assert "\\begin{longtable}" in to_latex("| a | b |\n|---|---|\n| 1 | 2 |\n")
+
+
+def test_heading_before_table_uses_strict_needspace() -> None:
+    out = to_latex("## Section\n\n| a | b |\n|---|---|\n| 1 | 2 |\n")
+    assert "\\Needspace{" in out.split("\\subsection")[0]
+    plain = to_latex("## Section\n\nSome text.\n")
+    assert "\\Needspace{" not in plain

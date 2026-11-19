@@ -301,6 +301,10 @@ local function keeper(blocks, i)
   return is_lead_in(b, blocks[i + 1])
 end
 
+-- extra lines kept free before a table: its rules, head and a first row
+-- that may wrap onto two or three lines
+local TABLE_ROOM = 5
+
 local function keep_with_next(blocks, top)
   local out, fresh, in_run = pandoc.List(), top, false
   for i, block in ipairs(blocks) do
@@ -314,8 +318,17 @@ local function keep_with_next(blocks, top)
       if not in_run then
         local n = 0
         while keeper(blocks, i + n) do n = n + 1 end
+        -- Before a table, \Needspace: it measures the space left and
+        -- leaves no stretchable break point. With \needspace's soft one,
+        -- TeX can still break before the heading after longtable has
+        -- started, and longtable then prints its head again at the top of
+        -- the next page, above the heading. The extra lines are for the
+        -- table's rules, head and first row.
+        local before_table = blocks[i + n] and blocks[i + n].t == "Table"
+        local lines = 3 + 3 * n + (before_table and TABLE_ROOM or 0)
         out:insert(pandoc.RawBlock("latex",
-          "\\needspace{" .. (3 + 3 * n) .. "\\baselineskip}"))
+          (before_table and "\\Needspace{" or "\\needspace{")
+          .. lines .. "\\baselineskip}"))
       end
       out:insert(block)
       if block.t ~= "Header" then
