@@ -1,0 +1,31 @@
+name: Bug report
+description: A note renders wrongly, or rendering fails
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: note
+    attributes:
+      label: The smallest note that shows it
+      description: A few lines of Markdown are usually enough. Remove anything private.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output or error
+      description: The terminal output, or a screenshot of the page.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `typeup --version`, `pandoc --version | head -1` and `xelatex --version | head -1`, plus your OS.
+    validations:
+      required: true

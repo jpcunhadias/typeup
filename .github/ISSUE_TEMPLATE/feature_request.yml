@@ -1,0 +1,16 @@
+name: Feature request
+description: A new box, mark, layout option or command
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What you want to do
+      description: The situation in your notes, and what is missing or awkward today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How it could look
+      description: The Markdown you would like to write, and what the PDF should show.
