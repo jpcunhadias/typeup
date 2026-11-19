@@ -13,6 +13,8 @@ follow [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- A table that starts near the bottom of a page no longer leaves a copy
+  of its head at the top of the next page, above its own heading.
 - Lists, tables, formulas and code that follow a labelled line in a
   blockquote stay inside that mark box instead of falling out into a
   plain quote.

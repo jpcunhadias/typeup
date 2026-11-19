@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -73,3 +74,35 @@ def test_template_command(tmp_path: Path) -> None:
     assert main(["template", "homework", str(dest)]) == 0
     assert "\\begin{problem}" in dest.read_text()
     assert main(["template", "homework", str(dest)]) == 1  # no overwrite
+
+
+def _table_at_page_break(filler: int) -> str:
+    """A section with a pipe table, pushed down the page by filler text."""
+    para = "Filler text that wraps across the line so the page fills up at a steady pace, " * 2
+    rows = "\n".join(
+        f"| Dist{i} | $p(1-p)^{{k}}$ | {i} | {2 * i} "
+        "| a longer cell that may wrap onto a second line |"
+        for i in range(12)
+    )
+    head = "| Name | PMF | Mean | Var | Notes |\n|---|---|---|---|---|\n"
+    return (
+        "# Repro\n\n" + (para + "\n\n") * filler + "## The table section\n\n" + head + rows + "\n"
+    )
+
+
+@pytest.mark.tex
+@needs_xelatex
+@pytest.mark.parametrize("filler", [26, 41])
+def test_table_head_not_repeated_above_heading(tmp_path: Path, filler: int) -> None:
+    """A table starting near a page break must not leave a copy of its head
+    at the top of the next page, above its own heading (these filler sizes
+    showed it with the soft \\needspace)."""
+    if shutil.which("pdftotext") is None:
+        pytest.skip("pdftotext not installed")
+    note = tmp_path / "repro.md"
+    note.write_text(_table_at_page_break(filler))
+    out = tmp_path / "repro.pdf"
+    assert main(["render", "--no-file-links", str(note), "-o", str(out)]) == 0
+    text = subprocess.run(["pdftotext", str(out), "-"], capture_output=True, text=True).stdout
+    lines = [line.strip() for line in text.splitlines()]
+    assert lines.index("PMF") > lines.index("The table section")
