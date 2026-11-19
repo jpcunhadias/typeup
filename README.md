@@ -41,8 +41,8 @@ The [example notes](examples/LinearAlgebra/notes/) and
 From a clone:
 
 ```bash
-git clone <this repository> typeup
-uv tool install ./typeup
+git clone https://github.com/jpcunhadias/typeup.git
+uv tool install ./typeup   # or: uv tool install git+https://github.com/jpcunhadias/typeup
 typeup --version
 ```
 

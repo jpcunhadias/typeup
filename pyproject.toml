@@ -20,6 +20,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/jpcunhadias/typeup"
+Issues = "https://github.com/jpcunhadias/typeup/issues"
+Changelog = "https://github.com/jpcunhadias/typeup/blob/main/CHANGELOG.md"
+
 [project.scripts]
 typeup = "typeup.cli:main"
 

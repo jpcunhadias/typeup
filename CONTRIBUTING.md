@@ -9,7 +9,7 @@ You need pandoc 3+, XeLaTeX (TeX Live), latexmk, pdftoppm and
 [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone <this repository> typeup && cd typeup
+git clone https://github.com/jpcunhadias/typeup.git && cd typeup
 uv sync --all-groups
 uv run pre-commit install
 ```

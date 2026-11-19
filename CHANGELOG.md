@@ -39,3 +39,6 @@ follow [Semantic Versioning](https://semver.org/).
   templates.
 - `typeup.notes` matplotlib style.
 - Example notes, their rendered PDFs, and CI that renders them.
+
+[Unreleased]: https://github.com/jpcunhadias/typeup/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jpcunhadias/typeup/releases/tag/v0.1.0
