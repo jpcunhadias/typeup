@@ -1,5 +1,8 @@
 # typeup
 
+[![CI](https://github.com/jpcunhadias/typeup/actions/workflows/ci.yml/badge.svg)](https://github.com/jpcunhadias/typeup/actions/workflows/ci.yml)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 Turn typed-up lecture notes in Markdown into clean, consistent PDFs.
 
 typeup is for notes typed from handwriting, board photos or slides, where
@@ -115,7 +118,9 @@ pandoc note.md --from=markdown+bracketed_spans --pdf-engine=xelatex \
 ## Contributing
 
 Bug reports, examples of notes that render badly, and pull requests are
-welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[code of conduct](CODE_OF_CONDUCT.md); report security problems as the
+[security policy](SECURITY.md) describes.
 
 ## Acknowledgements
 

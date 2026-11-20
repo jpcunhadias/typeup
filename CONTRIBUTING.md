@@ -54,6 +54,44 @@ make examples   # figures, example PDFs, combined PDF, README screenshot
 - Example notes must not contain personal data or links to local files.
   CI fails if a rendered PDF contains a local path.
 
+## Branches and pull requests
+
+`main` is protected: every change goes through a pull request, and CI
+must pass before it can be merged.
+
+1. Fork the repository (or, with write access, branch from `main`).
+2. Name the branch after the change: `fix/table-head-at-page-break`,
+   `feat/sans-maths-font`, `docs/config-examples`.
+3. Open a pull request against `main`. Fill in the template: a
+   `## Summary` of what changed and why, and a `## Test plan` with what
+   you checked.
+4. Keep the branch up to date with `main`. Pull requests are squash-merged,
+   so the title becomes the commit on `main`: write it as a Conventional
+   Commit.
+
+Small, focused pull requests are reviewed fastest. For a larger change,
+open an issue first so we can agree on the approach.
+
+## Releases
+
+The maintainer releases from `main`:
+
+1. Move the "Unreleased" entries in `CHANGELOG.md` under a new version
+   heading, and set `__version__` in `src/typeup/__init__.py`.
+2. Merge that through a pull request, then tag it:
+   `git tag v0.2.0 && git push origin v0.2.0`.
+3. The release workflow checks that the tag matches `__version__` and
+   creates the GitHub release with that version's changelog notes.
+
+Versions follow [Semantic Versioning](https://semver.org/). A change to
+how notes look is a minor version, even when nothing breaks.
+
+## Code of conduct
+
+Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md).
+Security problems go through the [security policy](SECURITY.md), not
+public issues.
+
 ## Licence
 
 By contributing you agree that your contribution is licensed under the
