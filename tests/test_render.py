@@ -22,6 +22,34 @@ def test_dated_notes_range() -> None:
     assert len(dated_notes(EXAMPLES, start="2026-01-15")) == 1
 
 
+@pytest.mark.parametrize("bad", ["zzz", "2026-02-30"])
+def test_combine_rejects_bad_range(bad: str, capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as err:
+        main(["combine", str(EXAMPLES), "-o", "x.pdf", "--from", bad])
+    assert err.value.code == 2
+    assert "--from" in capsys.readouterr().err
+    with pytest.raises(ValueError):
+        dated_notes(EXAMPLES, until=bad)
+
+
+@needs_pandoc
+@pytest.mark.parametrize(
+    ("bounds", "count"),
+    [
+        ([], 2),
+        (["--from", "2026-01-15"], 1),
+        (["--until", "2026-01-14"], 1),
+        (["--from", "2026-01-01", "--until", "2026-01-31"], 2),
+    ],
+)
+def test_combine_cli_date_bounds_are_optional(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], bounds: list[str], count: int
+) -> None:
+    out = tmp_path / "all.tex"  # LaTeX output: no TeX run needed
+    assert main(["combine", str(EXAMPLES), "-o", str(out), "--no-file-links", *bounds]) == 0
+    assert f"({count} notes)" in capsys.readouterr().out
+
+
 def test_default_output(tmp_path: Path) -> None:
     note = tmp_path / "a.md"
     assert default_output(note) == tmp_path / "a.pdf"
@@ -57,6 +85,59 @@ def test_no_local_paths_in_pdf(tmp_path: Path) -> None:
     out = tmp_path / "x.pdf"
     assert main(["render", "--no-file-links", str(note), "-o", str(out)]) == 0
     assert str(tmp_path).encode() not in out.read_bytes()
+
+
+def _combined_latex(tmp_path: Path, notes: dict[str, str], cfg: Config | None = None) -> str:
+    """Combine the notes and return pandoc's LaTeX (a .tex output: no TeX run)."""
+    folder = tmp_path / "Course" / "notes"
+    folder.mkdir(parents=True)
+    for name, text in notes.items():
+        (folder / name).write_text(text, encoding="utf-8")
+    out, _ = combine_notes(folder, tmp_path / "all.tex", cfg or Config(file_links=False))
+    return out.read_text(encoding="utf-8")
+
+
+def _note(name: str, extra: str = "", front: str = "") -> str:
+    return (
+        (f"---\n{front}\n---\n" if front else "")
+        + f"# {name}\n\n## Intro\n\nSee [slides] and a note[^1]. Back to [the intro](#intro).\n\n"
+        + f"{extra}[slides]: https://{name}.example\n[^1]: Footnote {name}\n"
+    )
+
+
+@needs_pandoc
+def test_combine_keeps_each_notes_references_and_footnotes(tmp_path: Path) -> None:
+    out = _combined_latex(
+        tmp_path, {"2026-01-01 one.md": _note("one"), "2026-01-08 two.md": _note("two")}
+    )
+    assert out.index("\\href{https://one.example}") < out.index("\\href{https://two.example}")
+    assert "\\footnote{Footnote one}" in out and "\\footnote{Footnote two}" in out
+
+
+@needs_pandoc
+def test_combine_namespaces_anchors_per_note(tmp_path: Path) -> None:
+    out = _combined_latex(
+        tmp_path, {"2026-01-01 one.md": _note("one"), "2026-01-08 two.md": _note("two")}
+    )
+    assert "\\label{note1-intro}" in out and "\\label{note2-intro}" in out
+    second = out[out.index("\\label{note2-two}") :]
+    assert "\\hyperref[note2-intro]{the intro}" in second
+
+
+@needs_pandoc
+def test_combine_legend_wording_per_note(tmp_path: Path) -> None:
+    notes = {
+        "2026-01-01 one.md": _note("one", front="legend-added: from *note* one"),
+        "2026-01-08 two.md": _note("two"),
+    }
+    out = _combined_latex(tmp_path, notes, Config(file_links=False, legend={"your": "mine"}))
+    first = out[out.index("\\label{note1-one}") - 400 : out.index("\\label{note1-one}")]
+    second = out[out.index("\\label{note2-two}") - 400 : out.index("\\label{note2-two}")]
+    assert "\\renewcommand{\\addedrole}{from \\emph{note} one}" in first
+    assert "\\let\\addedrole\\typeupdefaultaddedrole" in second
+    # the config's wording is what the defaults are saved from
+    top = out[: out.index("\\let\\typeupdefaultaddedrole")]
+    assert "\\renewcommand{\\yourrole}{mine}" in top
 
 
 @needs_pandoc

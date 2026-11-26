@@ -17,7 +17,8 @@ date: 2026-01-14
 ```
 
 A date written as `YYYY-MM-DD` is printed as "Wed 14 Jan 2026". Any other
-text, such as `Week 3`, is printed as given.
+text, such as `Week 3`, is printed as given. A `YYYY-MM-DD` date that is
+not on the calendar (`2026-02-30`) stops the render with an error.
 
 ## The file-name convention
 
@@ -50,6 +51,9 @@ narrow the range.
 - Each note starts on a new page with its own header (flags, then its
   front matter, then its file name).
 - The box numbers restart with each note.
+- Each note is read on its own: its reference links (`[slides]`),
+  footnotes (`[^1]`) and `legend-…` wording are its own, even when other
+  notes use the same names. Links to `#anchors` point into the same note.
 - The title page shows `--title` (default "Notes: <course>") and the
   date range, followed by a contents page that lists each note's
   first heading.

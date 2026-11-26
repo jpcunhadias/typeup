@@ -41,6 +41,14 @@ def test_source_label_is_escaped() -> None:
     assert "\\begin{marksource}{Board photo \\#3 \\& 4}" in out
 
 
+def test_source_label_escapes_caret_tilde_backslash() -> None:
+    out = to_latex("> **[Source ^ rev ~ a\\\\b]** text\n")
+    assert (
+        "\\begin{marksource}{Source \\textasciicircum{} rev \\textasciitilde{} "
+        "a\\textbackslash{}b}" in out
+    )
+
+
 def test_several_marks_in_one_quote() -> None:
     out = to_latex("> **[Added]** one\n> **[Your mark]** two\n")
     assert out.index("markadded") < out.index("markyour")
@@ -135,3 +143,14 @@ def test_heading_before_table_uses_strict_needspace() -> None:
     assert "\\Needspace{" in out.split("\\subsection")[0]
     plain = to_latex("## Section\n\nSome text.\n")
     assert "\\Needspace{" not in plain
+
+
+@pytest.mark.parametrize("date", ["2026-02-30", "2026-13-01", "2025-02-29"])
+def test_impossible_date_stops_the_render(date: str) -> None:
+    with pytest.raises(subprocess.CalledProcessError) as err:
+        to_latex("# T\n", f"--metadata=date:{date}")
+    assert "not a date on the calendar" in err.value.stderr
+
+
+def test_leap_day_and_weekday() -> None:
+    assert "{Thu 29 Feb 2024}" in to_latex("# T\n", "--metadata=date:2024-02-29")

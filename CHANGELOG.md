@@ -20,6 +20,19 @@ follow [Semantic Versioning](https://semver.org/).
   plain quote.
 - Tables inside mark and content boxes keep their bottom rule and the same
   stripes as tables outside a box.
+- Combined PDFs read each note on its own, so notes that use the same
+  reference link or footnote names (`[slides]`, `[^1]`) keep their own
+  targets and text, links to `#anchors` stay in their note, and a note's
+  `legend-…` front matter applies to that note only.
+- Source labels escape every LaTeX special character: `^`, `~` and `\`
+  no longer break the build.
+- Config values of the wrong type (`file_links = "false"`,
+  `mainfontoptions = "Scale=0.9"`, `legend = 12`) are rejected with an
+  error naming the file and key, as is a config file that isn't valid TOML.
+- A `YYYY-MM-DD` date that is not on the calendar (`2026-02-30`,
+  `2026-13-01`) stops the render with a clear error instead of printing a
+  wrong header or crashing the filter; `--from` and `--until` must be real
+  dates.
 
 ## [0.1.0] - 2026-11-19
 

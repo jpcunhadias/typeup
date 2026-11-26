@@ -11,9 +11,9 @@ import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 
-from . import FILTER, HEADER
+from . import COMBINE_FILTER, FILTER, HEADER
 from .config import Config
-from .meta import NoteMeta, from_path, note_date, strip_front_matter
+from .meta import NoteMeta, from_path, iso_date, note_date
 
 MIN_PANDOC = (3, 0)
 
@@ -84,6 +84,10 @@ def run_pandoc(args: Sequence[str], notes_dir: Path | None, cfg: Config) -> None
         env["TYPEUP_NOTES_DIR"] = str(notes_dir.resolve())
     proc = subprocess.run(["pandoc", *args], capture_output=True, text=True, env=env)
     if proc.returncode != 0:
+        # a filter's own error (a bad date, say) without the Lua traceback
+        for line in proc.stderr.splitlines():
+            if line.startswith("typeup: "):
+                raise RenderError(line.removeprefix("typeup: "))
         raise RenderError(proc.stderr.strip() or f"pandoc exited with {proc.returncode}")
     for line in proc.stderr.splitlines():
         if "WARNING" in line or "Missing character" in line:
@@ -143,6 +147,9 @@ def front_matter_meta(note: Path) -> NoteMeta:
 
 def dated_notes(folder: Path, start: str = "", until: str = "") -> list[Path]:
     """The notes in ``folder`` whose names start with a date in the range."""
+    for bound in (start, until):
+        if bound:
+            iso_date(bound)
     notes = []
     for f in sorted(folder.glob("*.md")):
         d = note_date(f)
@@ -174,10 +181,12 @@ def combine_notes(
     for note in notes:
         meta = from_path(note).merged(front_matter_meta(note)).merged(flags or NoteMeta())
         attrs = " ".join(f"{k}={_quote(v)}" for k, v in vars(meta).items() if v)
-        body = strip_front_matter(note.read_text(encoding="utf-8"))
-        # The marker div becomes \notebreak: a new page, numbering restarted
-        # and this note's header (marks.lua)
-        parts.append(f"\n\n::: {{.typeup-note {attrs}}}\n:::\n\n{body}\n")
+        # combine.lua reads the note on its own (so its references, footnotes
+        # and legend wording stay its own) and puts it after the marker;
+        # marks.lua turns the marker into \notebreak: a new page, numbering
+        # restarted and this note's header
+        src = _quote(str(note.resolve()))
+        parts.append(f"::: {{.typeup-note src={src} {attrs}}}\n:::\n\n")
     span = f"{note_date(notes[0])} to {note_date(notes[-1])}"
     if not title:
         course = from_path(notes[0]).course
@@ -188,6 +197,7 @@ def combine_notes(
         combined.write_text("".join(parts), encoding="utf-8")
         args = [
             str(combined),
+            f"--lua-filter={COMBINE_FILTER}",
             *common_args(cfg),
             f"--metadata-file={defaults_file(Path(tmp), cfg, NoteMeta())}",
             "--toc",

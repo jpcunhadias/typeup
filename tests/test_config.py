@@ -41,3 +41,42 @@ def test_legend_table(tmp_path: Path) -> None:
     f.write_text('[legend]\nadedd = "x"\n')
     with pytest.raises(ValueError, match="adedd"):
         load(f)
+
+
+@pytest.mark.parametrize(
+    ("text", "key"),
+    [
+        ('file_links = "false"', "file_links"),
+        ("mainfontoptions = 12", "mainfontoptions"),
+        ('mainfontoptions = "Scale=0.9"', "mainfontoptions"),
+        ("mainfontoptions = [1]", "mainfontoptions"),
+        ("fontsize = 11", "fontsize"),
+        ('margin = ""', "margin"),
+        ('linestretch = "1.5"', "linestretch"),
+        ("linestretch = true", "linestretch"),
+        ("linestretch = 0", "linestretch"),
+        ("linestretch = nan", "linestretch"),
+        ("linestretch = inf", "linestretch"),
+        ("linestretch = -inf", "linestretch"),
+        ("legend = 12", "legend"),
+        ("[legend]\nadded = 3", "legend.added"),
+    ],
+)
+def test_wrong_value_types(tmp_path: Path, text: str, key: str) -> None:
+    f = tmp_path / "config.toml"
+    f.write_text(text + "\n")
+    with pytest.raises(ValueError, match=rf"config\.toml: {key} must be"):
+        load(f)
+
+
+def test_int_linestretch_is_fine(tmp_path: Path) -> None:
+    f = tmp_path / "config.toml"
+    f.write_text("linestretch = 2\n")
+    assert load(f).linestretch == 2
+
+
+def test_invalid_toml_names_the_file(tmp_path: Path) -> None:
+    f = tmp_path / "config.toml"
+    f.write_text("fontsize = \n")
+    with pytest.raises(ValueError, match="config.toml: not valid TOML"):
+        load(f)

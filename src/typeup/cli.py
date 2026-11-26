@@ -10,12 +10,19 @@ from pathlib import Path
 
 from . import FILTER, HEADER, MPLSTYLE, TEMPLATES_DIR, __version__
 from .config import load
-from .meta import NoteMeta
+from .meta import NoteMeta, iso_date
 from .render import RenderError, combine_notes, render_note
 from .tex import CompileError, compile_tex
 
 TEMPLATES = sorted(p.stem for p in TEMPLATES_DIR.glob("*.tex"))
 PATHS = {"filter": FILTER, "header": HEADER, "mplstyle": MPLSTYLE, "templates": TEMPLATES_DIR}
+
+
+def _date_arg(text: str) -> str:
+    try:
+        return iso_date(text)
+    except ValueError as err:
+        raise argparse.ArgumentTypeError(str(err)) from None
 
 
 def _meta_flags(p: argparse.ArgumentParser) -> None:
@@ -49,8 +56,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("combine", help="all dated notes of a folder in one PDF")
     p.add_argument("folder", type=Path, metavar="DIR")
     p.add_argument("-o", "--out", type=Path, required=True, help="output PDF")
-    p.add_argument("--from", dest="start", default="", metavar="YYYY-MM-DD")
-    p.add_argument("--until", default="", metavar="YYYY-MM-DD")
+    p.add_argument("--from", dest="start", type=_date_arg, metavar="YYYY-MM-DD")
+    p.add_argument("--until", type=_date_arg, metavar="YYYY-MM-DD")
     p.add_argument("--title", default="", help="title page (default: Notes: <course>)")
     _meta_flags(p)
     _render_flags(p)
@@ -87,7 +94,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"ok: {render_note(note, cfg, args.out, flags)}")
             else:
                 out, notes = combine_notes(
-                    args.folder, args.out, cfg, args.start, args.until, args.title, flags
+                    args.folder,
+                    args.out,
+                    cfg,
+                    args.start or "",
+                    args.until or "",
+                    args.title,
+                    flags,
                 )
                 print(f"ok: {out} ({len(notes)} notes)")
         elif args.command == "tex":

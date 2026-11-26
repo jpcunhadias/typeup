@@ -16,6 +16,7 @@ Looked up at ``$TYPEUP_CONFIG``, else ``$XDG_CONFIG_HOME/typeup/config.toml``
 
 from __future__ import annotations
 
+import math
 import os
 import tomllib
 from dataclasses import dataclass, field, fields
@@ -54,20 +55,50 @@ def config_path() -> Path:
     return Path(base) / "typeup" / "config.toml"
 
 
+def _check_types(path: Path, data: dict[str, Any]) -> None:
+    """A ValueError naming the file and key for any value of the wrong type."""
+
+    def fail(key: str, want: str) -> None:
+        raise ValueError(f"{path}: {key} must be {want}, not {data[key]!r}")
+
+    for key in ("mainfont", "fontsize", "margin"):
+        if key in data and not (isinstance(data[key], str) and data[key].strip()):
+            fail(key, "a non-empty string")
+    opts = data.get("mainfontoptions", [])
+    if not (isinstance(opts, list) and all(isinstance(o, str) for o in opts)):
+        fail("mainfontoptions", 'a list of strings, like ["Scale=0.95"]')
+    stretch = data.get("linestretch", 1)
+    number = isinstance(stretch, int | float) and not isinstance(stretch, bool)
+    if not (number and math.isfinite(stretch) and stretch > 0):
+        fail("linestretch", "a finite positive number")
+    if not isinstance(data.get("file_links", True), bool):
+        fail("file_links", "true or false (no quotes)")
+    legend = data.get("legend", {})
+    if not isinstance(legend, dict):
+        fail("legend", f"a [legend] table with keys {', '.join(LEGEND_KEYS)}")
+    bad = sorted(set(legend) - set(LEGEND_KEYS))
+    if bad:
+        raise ValueError(f"{path}: unknown [legend] key(s): {', '.join(bad)}")
+    for key, value in legend.items():
+        if not isinstance(value, str):
+            raise ValueError(f"{path}: legend.{key} must be a string, not {value!r}")
+
+
 def load(path: Path | None = None) -> Config:
     """The config file's values on top of the defaults."""
     path = path or config_path()
     cfg = Config()
     if not path.is_file():
         return cfg
-    data: dict[str, Any] = tomllib.loads(path.read_text(encoding="utf-8"))
+    try:
+        data: dict[str, Any] = tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as err:
+        raise ValueError(f"{path}: not valid TOML: {err}") from err
     known = {f.name for f in fields(Config)}
     unknown = sorted(set(data) - known)
     if unknown:
         raise ValueError(f"{path}: unknown key(s): {', '.join(unknown)}")
-    bad = sorted(set(data.get("legend", {})) - set(LEGEND_KEYS))
-    if bad:
-        raise ValueError(f"{path}: unknown [legend] key(s): {', '.join(bad)}")
+    _check_types(path, data)
     if "mainfont" in data and "mainfontoptions" not in data:
         # a font given by name needs none of the default font's file options
         cfg.mainfontoptions = []

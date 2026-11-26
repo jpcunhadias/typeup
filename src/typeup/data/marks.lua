@@ -16,6 +16,16 @@ if not FORMAT:match("latex") then
   return {}
 end
 
+-- Plain text as LaTeX: every special character escaped
+local function tex_escape(s)
+  return (s:gsub("[\\{}$&#%%_%^~]", function(c)
+    if c == "\\" then return "\\textbackslash{}" end
+    if c == "^" then return "\\textasciicircum{}" end
+    if c == "~" then return "\\textasciitilde{}" end
+    return "\\" .. c
+  end))
+end
+
 local function label_of(inline)
   if inline and inline.t == "Strong" then
     local text = pandoc.utils.stringify(inline)
@@ -70,7 +80,7 @@ local function boxed(run)
   end
   for k = start, #run do body:insert(run[k]) end
   local open = env == "marksource"
-    and ("\\begin{marksource}{" .. extra:gsub("([#$%%&_{}])", "\\%1") .. "}")
+    and ("\\begin{marksource}{" .. tex_escape(extra) .. "}")
     or ("\\begin{" .. env .. "}")
   return { pandoc.RawBlock("latex", open), pandoc.Para(body),
            pandoc.RawBlock("latex", "\\end{" .. env .. "}") }
@@ -185,13 +195,24 @@ local months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                  "Sep", "Oct", "Nov", "Dec" }
 local weekdays = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" }
 
+local month_days = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+
+-- A YYYY-MM-DD date that is not on the calendar (2026-02-30, 2026-13-01)
+-- is a typo, so it stops the render instead of printing a wrong header
 local function format_date(text)
-  local y, m, d = text:match("^(%d%d%d%d)-(%d%d)-(%d%d)$")
-  if not y then return text end
-  local t = os.time({ year = tonumber(y), month = tonumber(m), day = tonumber(d), hour = 12 })
-  if not t then return text end
-  local wday = os.date("*t", t).wday
-  return weekdays[wday] .. " " .. tonumber(d) .. " " .. months[tonumber(m)] .. " " .. y
+  local ys, ms, ds = text:match("^(%d%d%d%d)-(%d%d)-(%d%d)$")
+  if not ys then return text end
+  local y, m, d = tonumber(ys), tonumber(ms), tonumber(ds)
+  local leap = (y % 4 == 0 and y % 100 ~= 0) or y % 400 == 0
+  local last = (m == 2 and leap) and 29 or month_days[m]
+  if not last or d < 1 or d > last then
+    error("typeup: " .. text .. " is not a date on the calendar (YYYY-MM-DD)", 0)
+  end
+  -- Sakamoto's day of the week, 0 = Sunday
+  local offsets = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 }
+  local yy = m < 3 and y - 1 or y
+  local wday = (yy + yy // 4 - yy // 100 + yy // 400 + offsets[m] + d) % 7
+  return weekdays[wday + 1] .. " " .. d .. " " .. months[m] .. " " .. ys
 end
 
 -- A metadata value (or attribute string) as LaTeX: Markdown is rendered,
@@ -377,15 +398,6 @@ end
 
 -- Inline code (file paths, function names) may wrap after / _ - . so a
 -- long path doesn't run into the right margin
-local function tex_escape(s)
-  return (s:gsub("[\\{}$&#%%_%^~]", function(c)
-    if c == "\\" then return "\\textbackslash{}" end
-    if c == "^" then return "\\textasciicircum{}" end
-    if c == "~" then return "\\textasciitilde{}" end
-    return "\\" .. c
-  end))
-end
-
 function Code(code)
   local out = {}
   for ch in code.text:gmatch(utf8.charpattern) do
