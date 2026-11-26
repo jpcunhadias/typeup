@@ -181,12 +181,26 @@ local content_boxes = {
   exercise = "nbexercise", proof = "nbproof",
 }
 
+-- A box title as LaTeX. A title is inline text: math and emphasis work, but
+-- one that starts like a block ("1) Primal" or "(a) ..." as a list,
+-- "# ..." as a heading, "> ..." as a quote) must not turn into one. So it
+-- is read behind a placeholder word, which keeps pandoc inside a paragraph,
+-- and the placeholder is dropped again.
+local TITLE_LEAD = "TypeupTitleLead"
+
 local function latex_title(text)
-  if not text or text == "" then return "" end
-  local doc = pandoc.read(text, "markdown")
-  local blocks = doc.blocks
-  if #blocks == 0 then return "" end
-  return (pandoc.write(pandoc.Pandoc({ pandoc.Plain(blocks[1].content) }), "latex"):gsub("%s+$", ""))
+  if not text then return "" end
+  text = text:gsub("%s+", " "):gsub("^ ", ""):gsub(" $", "")
+  if text == "" then return "" end
+  local blocks = pandoc.read(TITLE_LEAD .. " " .. text, "markdown").blocks
+  local lead = #blocks == 1 and blocks[1].t == "Para" and blocks[1].content
+  if not lead or #lead < 3 or lead[1].t ~= "Str" or lead[1].text ~= TITLE_LEAD
+      or lead[2].t ~= "Space" then
+    return tex_escape(text) -- not a plain paragraph after all: print it as typed
+  end
+  local inlines = pandoc.Inlines({})
+  for k = 3, #lead do inlines:insert(lead[k]) end
+  return (pandoc.write(pandoc.Pandoc({ pandoc.Plain(inlines) }), "latex"):gsub("%s+$", ""))
 end
 
 -- Header metadata: course, label and date (YYYY-MM-DD is written out as
