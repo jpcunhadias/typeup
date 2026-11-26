@@ -26,6 +26,9 @@ follow [Semantic Versioning](https://semver.org/).
   `legend-…` front matter applies to that note only.
 - Source labels escape every LaTeX special character: `^`, `~` and `\`
   no longer break the build.
+- A box title that starts like a list, quote or heading (`1) Primal`,
+  `(a) …`, `- …`, `> …`) no longer crashes the filter, and `# …` keeps
+  its `#`: titles are always read as inline text.
 - Config values of the wrong type (`file_links = "false"`,
   `mainfontoptions = "Scale=0.9"`, `legend = 12`) are rejected with an
   error naming the file and key, as is a config file that isn't valid TOML.

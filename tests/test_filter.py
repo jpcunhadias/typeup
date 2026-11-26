@@ -67,6 +67,27 @@ def test_content_box_with_math_title() -> None:
     assert "\\begin{nbtheorem}{Weak duality for \\(c\\)}" in out
 
 
+@pytest.mark.parametrize(
+    ("title", "latex"),
+    [
+        ("1) Primal", "1) Primal"),
+        ("(1) Primal", "(1) Primal"),
+        ("1. Primal", "1. Primal"),
+        ("A) Part", "A) Part"),
+        ("i) roman", "i) roman"),
+        ("- note", "- note"),
+        ("> quoted", "\\textgreater{} quoted"),
+        ("# Heading", "\\# Heading"),
+        ("1) *Key* step for $x$", "1) \\emph{Key} step for \\(x\\)"),
+    ],
+)
+def test_box_title_that_looks_like_a_block_stays_text(title: str, latex: str) -> None:
+    # Pandoc reads a lone "1) ..." or "- ..." as a list and "# ..." as a
+    # heading; a title is always inline text, so the marker must survive.
+    out = to_latex(f'::: {{.theorem title="{title}"}}\nBody.\n:::\n')
+    assert f"\\begin{{nbtheorem}}{{{latex}}}" in out
+
+
 def test_legend_and_proof() -> None:
     out = to_latex("::: legend\nx\n:::\n\n::: proof\ny\n:::\n")
     assert "\\begin{notelegend}" in out
