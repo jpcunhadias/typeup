@@ -55,6 +55,10 @@ your = "my own notes"
 The keys are `added`, `your`, `unclear` and `source` (`legend-…` in
 front matter). Front matter wins over the config file.
 
+Values must have the right type (`file_links = false`, not `"false"`;
+`mainfontoptions` a list of strings); a wrong one stops typeup with an
+error naming the file and key.
+
 Note: pandoc ignores `header-includes` in a note's front matter when a
 header file is passed with `--include-in-header`, which typeup does. Put
 LaTeX changes in `notes-header.tex` instead.

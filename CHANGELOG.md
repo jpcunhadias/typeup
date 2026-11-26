@@ -22,6 +22,9 @@ follow [Semantic Versioning](https://semver.org/).
   stripes as tables outside a box.
 - Source labels escape every LaTeX special character: `^`, `~` and `\`
   no longer break the build.
+- Config values of the wrong type (`file_links = "false"`,
+  `mainfontoptions = "Scale=0.9"`, `legend = 12`) are rejected with an
+  error naming the file and key, as is a config file that isn't valid TOML.
 
 ## [0.1.0] - 2026-11-19
 
