@@ -14,7 +14,7 @@ jobs:
     name: GitHub release
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check the tag matches the package version
         run: |
           version=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/typeup/__init__.py)
