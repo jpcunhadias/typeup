@@ -16,6 +16,16 @@ if not FORMAT:match("latex") then
   return {}
 end
 
+-- Plain text as LaTeX: every special character escaped
+local function tex_escape(s)
+  return (s:gsub("[\\{}$&#%%_%^~]", function(c)
+    if c == "\\" then return "\\textbackslash{}" end
+    if c == "^" then return "\\textasciicircum{}" end
+    if c == "~" then return "\\textasciitilde{}" end
+    return "\\" .. c
+  end))
+end
+
 local function label_of(inline)
   if inline and inline.t == "Strong" then
     local text = pandoc.utils.stringify(inline)
@@ -70,7 +80,7 @@ local function boxed(run)
   end
   for k = start, #run do body:insert(run[k]) end
   local open = env == "marksource"
-    and ("\\begin{marksource}{" .. extra:gsub("([#$%%&_{}])", "\\%1") .. "}")
+    and ("\\begin{marksource}{" .. tex_escape(extra) .. "}")
     or ("\\begin{" .. env .. "}")
   return { pandoc.RawBlock("latex", open), pandoc.Para(body),
            pandoc.RawBlock("latex", "\\end{" .. env .. "}") }
@@ -377,15 +387,6 @@ end
 
 -- Inline code (file paths, function names) may wrap after / _ - . so a
 -- long path doesn't run into the right margin
-local function tex_escape(s)
-  return (s:gsub("[\\{}$&#%%_%^~]", function(c)
-    if c == "\\" then return "\\textbackslash{}" end
-    if c == "^" then return "\\textasciicircum{}" end
-    if c == "~" then return "\\textasciitilde{}" end
-    return "\\" .. c
-  end))
-end
-
 function Code(code)
   local out = {}
   for ch in code.text:gmatch(utf8.charpattern) do

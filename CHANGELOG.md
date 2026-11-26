@@ -20,6 +20,8 @@ follow [Semantic Versioning](https://semver.org/).
   plain quote.
 - Tables inside mark and content boxes keep their bottom rule and the same
   stripes as tables outside a box.
+- Source labels escape every LaTeX special character: `^`, `~` and `\`
+  no longer break the build.
 
 ## [0.1.0] - 2026-11-19
 

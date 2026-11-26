@@ -41,6 +41,14 @@ def test_source_label_is_escaped() -> None:
     assert "\\begin{marksource}{Board photo \\#3 \\& 4}" in out
 
 
+def test_source_label_escapes_caret_tilde_backslash() -> None:
+    out = to_latex("> **[Source ^ rev ~ a\\\\b]** text\n")
+    assert (
+        "\\begin{marksource}{Source \\textasciicircum{} rev \\textasciitilde{} "
+        "a\\textbackslash{}b}" in out
+    )
+
+
 def test_several_marks_in_one_quote() -> None:
     out = to_latex("> **[Added]** one\n> **[Your mark]** two\n")
     assert out.index("markadded") < out.index("markyour")
