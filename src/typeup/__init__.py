@@ -14,10 +14,12 @@ PACKAGE_DIR = Path(str(files("typeup")))
 DATA_DIR = PACKAGE_DIR / "data"
 TEMPLATES_DIR = PACKAGE_DIR / "templates"
 FILTER = DATA_DIR / "marks.lua"
+COMBINE_FILTER = DATA_DIR / "combine.lua"
 HEADER = DATA_DIR / "notes-header.tex"
 MPLSTYLE = PACKAGE_DIR / "notes.mplstyle"
 
 __all__ = [
+    "COMBINE_FILTER",
     "DATA_DIR",
     "FILTER",
     "HEADER",

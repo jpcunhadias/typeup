@@ -9,7 +9,6 @@ from typeup.meta import (
     date_and_label,
     from_path,
     iso_date,
-    strip_front_matter,
 )
 
 
@@ -72,12 +71,6 @@ def test_from_path(tmp_path: Path) -> None:
 def test_merged_keeps_empty_fields() -> None:
     base = NoteMeta("A", "B", "2026-01-01")
     assert base.merged(NoteMeta(label="X")) == NoteMeta("A", "X", "2026-01-01")
-
-
-def test_strip_front_matter() -> None:
-    text = "---\ncourse: X\n---\n# Title\n\n---\n\nrule above\n"
-    assert strip_front_matter(text) == "# Title\n\n---\n\nrule above\n"
-    assert strip_front_matter("# No front matter\n") == "# No front matter\n"
 
 
 def test_iso_date() -> None:

@@ -21,7 +21,6 @@ SMALL_WORDS = frozenset({"a", "an", "and", "at", "for", "in", "of", "on", "the",
 _DATED = re.compile(r"^(\d{4}-\d{2}-\d{2})[ _]")
 _CODE = re.compile(r"^[A-Z][A-Za-z]{1,3}$")
 _NUMBERED = re.compile(r"^[A-Z][0-9]+$")
-_FRONT_MATTER = re.compile(r"\A---[ \t]*\n.*?\n(?:---|\.\.\.)[ \t]*(?:\n|\Z)", re.DOTALL)
 
 
 @dataclass(frozen=True)
@@ -115,8 +114,3 @@ def from_path(path: Path) -> NoteMeta:
 def note_date(path: Path) -> str:
     """The YYYY-MM-DD date a note's file name starts with, or ""."""
     return date_and_label(path.stem)[0]
-
-
-def strip_front_matter(text: str) -> str:
-    """The note without a YAML block at its very top."""
-    return _FRONT_MATTER.sub("", text, count=1)

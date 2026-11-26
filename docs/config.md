@@ -53,7 +53,8 @@ your = "my own notes"
 ```
 
 The keys are `added`, `your`, `unclear` and `source` (`legend-…` in
-front matter). Front matter wins over the config file.
+front matter). Front matter wins over the config file. In a combined
+PDF, a note's front matter changes the wording for that note only.
 
 Values must have the right type (`file_links = false`, not `"false"`;
 `mainfontoptions` a list of strings); a wrong one stops typeup with an

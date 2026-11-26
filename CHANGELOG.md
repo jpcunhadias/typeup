@@ -20,6 +20,10 @@ follow [Semantic Versioning](https://semver.org/).
   plain quote.
 - Tables inside mark and content boxes keep their bottom rule and the same
   stripes as tables outside a box.
+- Combined PDFs read each note on its own, so notes that use the same
+  reference link or footnote names (`[slides]`, `[^1]`) keep their own
+  targets and text, links to `#anchors` stay in their note, and a note's
+  `legend-…` front matter applies to that note only.
 - Source labels escape every LaTeX special character: `^`, `~` and `\`
   no longer break the build.
 - Config values of the wrong type (`file_links = "false"`,

@@ -11,9 +11,9 @@ import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 
-from . import FILTER, HEADER
+from . import COMBINE_FILTER, FILTER, HEADER
 from .config import Config
-from .meta import NoteMeta, from_path, iso_date, note_date, strip_front_matter
+from .meta import NoteMeta, from_path, iso_date, note_date
 
 MIN_PANDOC = (3, 0)
 
@@ -181,10 +181,12 @@ def combine_notes(
     for note in notes:
         meta = from_path(note).merged(front_matter_meta(note)).merged(flags or NoteMeta())
         attrs = " ".join(f"{k}={_quote(v)}" for k, v in vars(meta).items() if v)
-        body = strip_front_matter(note.read_text(encoding="utf-8"))
-        # The marker div becomes \notebreak: a new page, numbering restarted
-        # and this note's header (marks.lua)
-        parts.append(f"\n\n::: {{.typeup-note {attrs}}}\n:::\n\n{body}\n")
+        # combine.lua reads the note on its own (so its references, footnotes
+        # and legend wording stay its own) and puts it after the marker;
+        # marks.lua turns the marker into \notebreak: a new page, numbering
+        # restarted and this note's header
+        src = _quote(str(note.resolve()))
+        parts.append(f"::: {{.typeup-note src={src} {attrs}}}\n:::\n\n")
     span = f"{note_date(notes[0])} to {note_date(notes[-1])}"
     if not title:
         course = from_path(notes[0]).course
@@ -195,6 +197,7 @@ def combine_notes(
         combined.write_text("".join(parts), encoding="utf-8")
         args = [
             str(combined),
+            f"--lua-filter={COMBINE_FILTER}",
             *common_args(cfg),
             f"--metadata-file={defaults_file(Path(tmp), cfg, NoteMeta())}",
             "--toc",
