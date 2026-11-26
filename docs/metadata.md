@@ -17,7 +17,8 @@ date: 2026-01-14
 ```
 
 A date written as `YYYY-MM-DD` is printed as "Wed 14 Jan 2026". Any other
-text, such as `Week 3`, is printed as given.
+text, such as `Week 3`, is printed as given. A `YYYY-MM-DD` date that is
+not on the calendar (`2026-02-30`) stops the render with an error.
 
 ## The file-name convention
 

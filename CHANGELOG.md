@@ -25,6 +25,10 @@ follow [Semantic Versioning](https://semver.org/).
 - Config values of the wrong type (`file_links = "false"`,
   `mainfontoptions = "Scale=0.9"`, `legend = 12`) are rejected with an
   error naming the file and key, as is a config file that isn't valid TOML.
+- A `YYYY-MM-DD` date that is not on the calendar (`2026-02-30`,
+  `2026-13-01`) stops the render with a clear error instead of printing a
+  wrong header or crashing the filter; `--from` and `--until` must be real
+  dates.
 
 ## [0.1.0] - 2026-11-19
 

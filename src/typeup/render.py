@@ -13,7 +13,7 @@ from pathlib import Path
 
 from . import FILTER, HEADER
 from .config import Config
-from .meta import NoteMeta, from_path, note_date, strip_front_matter
+from .meta import NoteMeta, from_path, iso_date, note_date, strip_front_matter
 
 MIN_PANDOC = (3, 0)
 
@@ -84,6 +84,10 @@ def run_pandoc(args: Sequence[str], notes_dir: Path | None, cfg: Config) -> None
         env["TYPEUP_NOTES_DIR"] = str(notes_dir.resolve())
     proc = subprocess.run(["pandoc", *args], capture_output=True, text=True, env=env)
     if proc.returncode != 0:
+        # a filter's own error (a bad date, say) without the Lua traceback
+        for line in proc.stderr.splitlines():
+            if line.startswith("typeup: "):
+                raise RenderError(line.removeprefix("typeup: "))
         raise RenderError(proc.stderr.strip() or f"pandoc exited with {proc.returncode}")
     for line in proc.stderr.splitlines():
         if "WARNING" in line or "Missing character" in line:
@@ -143,6 +147,9 @@ def front_matter_meta(note: Path) -> NoteMeta:
 
 def dated_notes(folder: Path, start: str = "", until: str = "") -> list[Path]:
     """The notes in ``folder`` whose names start with a date in the range."""
+    for bound in (start, until):
+        if bound:
+            iso_date(bound)
     notes = []
     for f in sorted(folder.glob("*.md")):
         d = note_date(f)

@@ -95,6 +95,17 @@ def date_and_label(stem: str) -> tuple[str, str]:
     return date, label
 
 
+def iso_date(text: str) -> str:
+    """``text`` if it is a real YYYY-MM-DD date, else a ValueError."""
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
+        raise ValueError(f"not a YYYY-MM-DD date: {text!r}")
+    try:
+        dt.date.fromisoformat(text)
+    except ValueError:
+        raise ValueError(f"not a date on the calendar: {text!r}") from None
+    return text
+
+
 def from_path(path: Path) -> NoteMeta:
     """Everything the path and file name say about a note."""
     date, label = date_and_label(path.stem)

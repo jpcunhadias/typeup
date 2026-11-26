@@ -143,3 +143,14 @@ def test_heading_before_table_uses_strict_needspace() -> None:
     assert "\\Needspace{" in out.split("\\subsection")[0]
     plain = to_latex("## Section\n\nSome text.\n")
     assert "\\Needspace{" not in plain
+
+
+@pytest.mark.parametrize("date", ["2026-02-30", "2026-13-01", "2025-02-29"])
+def test_impossible_date_stops_the_render(date: str) -> None:
+    with pytest.raises(subprocess.CalledProcessError) as err:
+        to_latex("# T\n", f"--metadata=date:{date}")
+    assert "not a date on the calendar" in err.value.stderr
+
+
+def test_leap_day_and_weekday() -> None:
+    assert "{Thu 29 Feb 2024}" in to_latex("# T\n", "--metadata=date:2024-02-29")

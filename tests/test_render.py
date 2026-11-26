@@ -22,6 +22,34 @@ def test_dated_notes_range() -> None:
     assert len(dated_notes(EXAMPLES, start="2026-01-15")) == 1
 
 
+@pytest.mark.parametrize("bad", ["zzz", "2026-02-30"])
+def test_combine_rejects_bad_range(bad: str, capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as err:
+        main(["combine", str(EXAMPLES), "-o", "x.pdf", "--from", bad])
+    assert err.value.code == 2
+    assert "--from" in capsys.readouterr().err
+    with pytest.raises(ValueError):
+        dated_notes(EXAMPLES, until=bad)
+
+
+@needs_pandoc
+@pytest.mark.parametrize(
+    ("bounds", "count"),
+    [
+        ([], 2),
+        (["--from", "2026-01-15"], 1),
+        (["--until", "2026-01-14"], 1),
+        (["--from", "2026-01-01", "--until", "2026-01-31"], 2),
+    ],
+)
+def test_combine_cli_date_bounds_are_optional(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], bounds: list[str], count: int
+) -> None:
+    out = tmp_path / "all.tex"  # LaTeX output: no TeX run needed
+    assert main(["combine", str(EXAMPLES), "-o", str(out), "--no-file-links", *bounds]) == 0
+    assert f"({count} notes)" in capsys.readouterr().out
+
+
 def test_default_output(tmp_path: Path) -> None:
     note = tmp_path / "a.md"
     assert default_output(note) == tmp_path / "a.pdf"

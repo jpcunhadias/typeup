@@ -8,6 +8,7 @@ from typeup.meta import (
     course_name,
     date_and_label,
     from_path,
+    iso_date,
     strip_front_matter,
 )
 
@@ -77,3 +78,10 @@ def test_strip_front_matter() -> None:
     text = "---\ncourse: X\n---\n# Title\n\n---\n\nrule above\n"
     assert strip_front_matter(text) == "# Title\n\n---\n\nrule above\n"
     assert strip_front_matter("# No front matter\n") == "# No front matter\n"
+
+
+def test_iso_date() -> None:
+    assert iso_date("2024-02-29") == "2024-02-29"
+    for bad in ("2026-02-30", "2026-13-01", "2026-1-5", "zzz", "2026-01-01x"):
+        with pytest.raises(ValueError):
+            iso_date(bad)
